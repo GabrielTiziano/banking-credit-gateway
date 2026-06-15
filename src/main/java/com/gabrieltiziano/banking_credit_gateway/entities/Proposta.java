@@ -1,13 +1,11 @@
 package com.gabrieltiziano.banking_credit_gateway.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
+@Builder
 @Entity
 @Table(name = "tb_propostas")
 @Getter
@@ -25,6 +23,7 @@ public class Proposta {
     @Column(name = "prazo_pagamento", nullable = false)
     private Integer prazoPagamento;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private StatusProposta status = StatusProposta.EM_ANALISE;
@@ -35,7 +34,7 @@ public class Proposta {
     @Column(length = 500)
     private String observacao;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_usuario", nullable = false, unique = true)
     private Usuario usuario;
 }
