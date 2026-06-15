@@ -25,7 +25,9 @@ public class Proposta {
     @Column(name = "prazo_pagamento", nullable = false)
     private Integer prazoPagamento;
 
-    private Boolean aprovada;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private StatusProposta status = StatusProposta.EM_ANALISE;
 
     @Column(nullable = false)
     private boolean integrada;
