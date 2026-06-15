@@ -1,3 +1,14 @@
 spring:
   application:
     name: banking-credit-gateway
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/banking_credit_gateway
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
