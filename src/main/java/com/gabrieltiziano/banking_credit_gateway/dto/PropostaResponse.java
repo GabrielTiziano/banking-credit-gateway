@@ -4,12 +4,15 @@ import com.gabrieltiziano.banking_credit_gateway.entities.Proposta;
 import com.gabrieltiziano.banking_credit_gateway.entities.StatusProposta;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public record PropostaResponse(
         Long id,
         String nome,
         String sobrenome,
-        BigDecimal valorSolicitado,
+        String cpf,
+        String valorSolicitadoFmt,
         Integer prazoPagamento,
         StatusProposta status,
         String observacao
@@ -19,10 +22,15 @@ public record PropostaResponse(
                 proposta.getId(),
                 proposta.getUsuario().getNome(),
                 proposta.getUsuario().getSobrenome(),
-                proposta.getValorSolicitado(),
+                proposta.getUsuario().getCpf(),
+                formatarMoeda(proposta.getValorSolicitado()),
                 proposta.getPrazoPagamento(),
                 proposta.getStatus(),
                 proposta.getObservacao()
         );
+    }
+
+    private static String formatarMoeda(BigDecimal valor){
+        return NumberFormat.getCurrencyInstance(new Locale("pt", "BR")).format(valor);
     }
 }
