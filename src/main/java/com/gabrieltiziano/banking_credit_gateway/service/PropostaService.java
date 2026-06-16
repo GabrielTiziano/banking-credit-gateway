@@ -7,6 +7,8 @@ import com.gabrieltiziano.banking_credit_gateway.repository.PropostaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class PropostaService {
     private final PropostaRepository propostaRepository;
@@ -18,5 +20,9 @@ public class PropostaService {
     @Transactional
     public PropostaResponse criar(PropostaRequest request) {
         return PropostaResponse.from(propostaRepository.save(PropostaMapper.toProposta(request)));
+    }
+
+    public List<PropostaResponse> listarPropostas(){
+        return propostaRepository.findAll().stream().map(PropostaResponse::from).toList();
     }
 }

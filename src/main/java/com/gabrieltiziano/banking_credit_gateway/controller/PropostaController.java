@@ -6,13 +6,12 @@ import com.gabrieltiziano.banking_credit_gateway.service.PropostaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/proposta")
+@RequestMapping("/propostas")
 public class PropostaController {
     private final PropostaService propostaService;
 
@@ -23,5 +22,10 @@ public class PropostaController {
     @PostMapping
     public ResponseEntity<PropostaResponse> criar(@Valid @RequestBody PropostaRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(propostaService.criar(request));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PropostaResponse>> listarPropostas(){
+        return ResponseEntity.ok(propostaService.listarPropostas());
     }
 }
