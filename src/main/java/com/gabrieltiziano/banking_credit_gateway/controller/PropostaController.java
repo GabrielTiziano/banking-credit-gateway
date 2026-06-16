@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/propostas")
+@RequestMapping("/proposta")
 public class PropostaController {
     private final PropostaService propostaService;
 
