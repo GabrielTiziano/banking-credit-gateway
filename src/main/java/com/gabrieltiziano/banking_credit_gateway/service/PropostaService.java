@@ -2,6 +2,7 @@ package com.gabrieltiziano.banking_credit_gateway.service;
 
 import com.gabrieltiziano.banking_credit_gateway.dto.PropostaRequest;
 import com.gabrieltiziano.banking_credit_gateway.dto.PropostaResponse;
+import com.gabrieltiziano.banking_credit_gateway.entities.Proposta;
 import com.gabrieltiziano.banking_credit_gateway.mapper.PropostaMapper;
 import com.gabrieltiziano.banking_credit_gateway.repository.PropostaRepository;
 import org.springframework.stereotype.Service;
@@ -12,14 +13,19 @@ import java.util.List;
 @Service
 public class PropostaService {
     private final PropostaRepository propostaRepository;
+    private final NotificacaoService notificacaoService;
 
-    public PropostaService(PropostaRepository propostaRepository) {
+    public PropostaService(PropostaRepository propostaRepository, NotificacaoService notificacaoService) {
         this.propostaRepository = propostaRepository;
+        this.notificacaoService = notificacaoService;
     }
 
     @Transactional
     public PropostaResponse criar(PropostaRequest request) {
-        return PropostaResponse.from(propostaRepository.save(PropostaMapper.toProposta(request)));
+        Proposta propostaSalva = propostaRepository.save(PropostaMapper.toProposta(request));
+        PropostaResponse dto = PropostaResponse.from(propostaSalva);
+        notificacaoService.notificar(dto, "proposta-pendente.ex");
+        return dto;
     }
 
     public List<PropostaResponse> listarPropostas(){
