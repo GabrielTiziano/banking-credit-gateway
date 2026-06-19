@@ -15,7 +15,7 @@ public record PropostaRequest(
         String sobrenome,
 
         @NotBlank(message = "Telefone é obrigatório")
-        @Pattern(regexp = "\\d{10,11}", message = "Telefone deve conter 10 ou 11 dígitos (apenas números)")
+        @Pattern(regexp = "\\d{10,13}", message = "Telefone deve conter entre 10 e 13 dígitos (apenas números)")
         String telefone,
 
         @NotBlank(message = "CPF é obrigatório")
