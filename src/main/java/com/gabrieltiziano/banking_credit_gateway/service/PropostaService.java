@@ -28,10 +28,20 @@ public class PropostaService {
 
     @Transactional
     public PropostaResponse criar(PropostaRequest request) {
-        Proposta propostaSalva = propostaRepository.save(PropostaMapper.toProposta(request));
-        PropostaResponse dto = PropostaResponse.from(propostaSalva);
-        notificacaoService.notificar(dto, exchange);
-        return dto;
+        Proposta proposta = PropostaMapper.toProposta(request);
+        proposta.setIntegrada(true);
+        Proposta salva = propostaRepository.save(proposta);
+        notificar(salva);
+        return PropostaResponse.from(salva);
+    }
+
+    private void notificar(Proposta proposta){
+        try {
+            notificacaoService.notificar(PropostaResponse.from(proposta), exchange);
+        } catch (Exception e) {
+            proposta.setIntegrada(false);
+            propostaRepository.save(proposta);
+        }
     }
 
     public List<PropostaResponse> listarPropostas(){
