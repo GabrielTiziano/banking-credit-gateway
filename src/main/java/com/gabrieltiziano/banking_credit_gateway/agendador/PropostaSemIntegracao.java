@@ -4,11 +4,15 @@ import com.gabrieltiziano.banking_credit_gateway.dto.PropostaResponse;
 import com.gabrieltiziano.banking_credit_gateway.entities.Proposta;
 import com.gabrieltiziano.banking_credit_gateway.repository.PropostaRepository;
 import com.gabrieltiziano.banking_credit_gateway.service.NotificacaoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
+@Component
 public class PropostaSemIntegracao {
     private final PropostaRepository propostaRepository;
     private final String exchange;
@@ -28,7 +32,7 @@ public class PropostaSemIntegracao {
                 notificacaoService.notificar(PropostaResponse.from(proposta), exchange);
                 atualizarProposta(proposta);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                log.warn("Falha ao reenviar proposta {}: {}", proposta.getId(), e.getMessage());
             }
         });
     }
