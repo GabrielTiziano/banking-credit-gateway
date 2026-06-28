@@ -5,6 +5,9 @@ import com.gabrieltiziano.banking_credit_gateway.entities.Proposta;
 import com.gabrieltiziano.banking_credit_gateway.repository.PropostaRepository;
 import com.gabrieltiziano.banking_credit_gateway.service.NotificacaoService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import java.util.concurrent.TimeUnit;
 
 public class PropostaSemIntegracao {
     private final PropostaRepository propostaRepository;
@@ -18,6 +21,7 @@ public class PropostaSemIntegracao {
         this.notificacaoService = notificacaoService;
     }
 
+    @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.SECONDS)
     public void buscarPropostasSemIntegracao(){
         propostaRepository.findAllByIntegradaIsFalse().forEach(proposta -> {
             try {
@@ -34,3 +38,4 @@ public class PropostaSemIntegracao {
         propostaRepository.save(proposta);
     }
 }
+
