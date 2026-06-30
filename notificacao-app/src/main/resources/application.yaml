@@ -1,3 +1,8 @@
 spring:
   application:
     name: microsservico_notificacao
+
+aws:
+  region: us-east-1
+  sns:
+    endpoint: http://localhost:4566

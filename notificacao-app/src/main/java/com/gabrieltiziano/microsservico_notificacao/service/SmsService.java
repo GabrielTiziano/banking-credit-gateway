@@ -1,4 +1,4 @@
-package com.gabrieltiziano.banking_credit_gateway.service;
+package com.gabrieltiziano.microsservico_notificacao.service;
 
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.sns.SnsClient;

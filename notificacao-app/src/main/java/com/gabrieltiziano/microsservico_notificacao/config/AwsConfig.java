@@ -1,4 +1,4 @@
-package com.gabrieltiziano.banking_credit_gateway.config;
+package com.gabrieltiziano.microsservico_notificacao.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
