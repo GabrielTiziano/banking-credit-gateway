@@ -16,8 +16,3 @@ spring:
 rabbitmq:
   propostapendente:
     exchange: proposta-pendente.ex
-
-aws:
-  region: us-east-1
-  sns:
-    endpoint: http://localhost:4566
