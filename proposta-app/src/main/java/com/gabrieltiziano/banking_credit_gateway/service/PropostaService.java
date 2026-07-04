@@ -1,5 +1,6 @@
 package com.gabrieltiziano.banking_credit_gateway.service;
 
+import com.gabrieltiziano.banking_credit_gateway.dto.PropostaPendenteMessage;
 import com.gabrieltiziano.banking_credit_gateway.dto.PropostaRequest;
 import com.gabrieltiziano.banking_credit_gateway.dto.PropostaResponse;
 import com.gabrieltiziano.banking_credit_gateway.entities.Proposta;
@@ -37,7 +38,7 @@ public class PropostaService {
 
     private void notificar(Proposta proposta){
         try {
-            notificacaoService.notificar(PropostaResponse.from(proposta), exchange);
+            notificacaoService.notificar(PropostaPendenteMessage.from(proposta), exchange);
         } catch (Exception e) {
             proposta.setIntegrada(false);
             propostaRepository.save(proposta);
