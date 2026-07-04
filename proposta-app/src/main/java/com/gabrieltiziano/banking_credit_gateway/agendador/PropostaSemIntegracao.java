@@ -1,6 +1,6 @@
 package com.gabrieltiziano.banking_credit_gateway.agendador;
 
-import com.gabrieltiziano.banking_credit_gateway.dto.PropostaResponse;
+import com.gabrieltiziano.banking_credit_gateway.dto.PropostaPendenteMessage;
 import com.gabrieltiziano.banking_credit_gateway.entities.Proposta;
 import com.gabrieltiziano.banking_credit_gateway.repository.PropostaRepository;
 import com.gabrieltiziano.banking_credit_gateway.service.NotificacaoService;
@@ -29,7 +29,7 @@ public class PropostaSemIntegracao {
     public void buscarPropostasSemIntegracao(){
         propostaRepository.findAllByIntegradaIsFalse().forEach(proposta -> {
             try {
-                notificacaoService.notificar(PropostaResponse.from(proposta), exchange);
+                notificacaoService.notificar(PropostaPendenteMessage.from(proposta), exchange);
                 atualizarProposta(proposta);
             } catch (Exception e) {
                 log.warn("Falha ao reenviar proposta {}: {}", proposta.getId(), e.getMessage());
