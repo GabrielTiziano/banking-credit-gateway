@@ -22,7 +22,7 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
 
   localstack:
-    image: localstack/localstack:latest
+    image: localstack/localstack:3
     container_name: banking-localstack
     ports:
       - "4566:4566"
