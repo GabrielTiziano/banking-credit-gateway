@@ -1,5 +1,6 @@
 package com.gabrieltiziano.analise_credito.service.strategy.impl;
 
+import com.gabrieltiziano.analise_credito.constantes.MensagemConstante;
 import com.gabrieltiziano.analise_credito.domain.Proposta;
 import com.gabrieltiziano.analise_credito.exceptions.StrategyException;
 import com.gabrieltiziano.analise_credito.service.strategy.CalculaPontuacao;
@@ -18,7 +19,7 @@ public class PontuacaoScoreImpl implements CalculaPontuacao {
         int score = score();
 
         if (score < PONTUACAO_MINIMA){
-            throw new StrategyException("Pontuação insuficiente para aprovação de crédito.");
+            throw new StrategyException(MensagemConstante.PONTUACAO_SERASA_BAIXA);
         } else if (score <= 400) {
             return 150;
         } else if (score <= 600) {
