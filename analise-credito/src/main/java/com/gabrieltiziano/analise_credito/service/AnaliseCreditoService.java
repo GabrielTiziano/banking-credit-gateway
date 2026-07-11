@@ -4,6 +4,7 @@ import com.gabrieltiziano.analise_credito.domain.Proposta;
 import com.gabrieltiziano.analise_credito.domain.StatusProposta;
 import com.gabrieltiziano.analise_credito.exceptions.StrategyException;
 import com.gabrieltiziano.analise_credito.service.strategy.CalculaPontuacao;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +12,16 @@ import java.util.List;
 @Service
 public class AnaliseCreditoService {
     private final List<CalculaPontuacao> strategiesCalculaPontuacao;
+    private final NotificacaoRabbitMQService notificacaoRabbitMQService;
 
-    public AnaliseCreditoService(List<CalculaPontuacao> strategiesCalculaPontuacao) {
+    private final String exchange;
+
+    public AnaliseCreditoService(List<CalculaPontuacao> strategiesCalculaPontuacao,
+                                 NotificacaoRabbitMQService notificacaoRabbitMQService,
+                                 @Value("${rabbitmq.propostaconcluida.exchange}") String exchange) {
         this.strategiesCalculaPontuacao = strategiesCalculaPontuacao;
+        this.notificacaoRabbitMQService = notificacaoRabbitMQService;
+        this.exchange = exchange;
     }
 
     public void analisar(Proposta proposta) {
@@ -24,6 +32,8 @@ public class AnaliseCreditoService {
             proposta.setStatus(aprovada ? StatusProposta.APROVADA : StatusProposta.REJEITADA);
         } catch (StrategyException e) {
             proposta.setStatus(StatusProposta.REJEITADA);
+            proposta.setObservacao(e.getMessage());
         }
+        notificacaoRabbitMQService.notificar(exchange, proposta);
     }
 }
