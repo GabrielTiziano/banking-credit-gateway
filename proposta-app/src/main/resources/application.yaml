@@ -18,3 +18,6 @@ rabbitmq:
     exchange: proposta-pendente.ex
   propostaconcluida:
     exchange: proposta-concluida.ex
+  queue:
+    proposta:
+      concluida: proposta-concluida.ms-proposta

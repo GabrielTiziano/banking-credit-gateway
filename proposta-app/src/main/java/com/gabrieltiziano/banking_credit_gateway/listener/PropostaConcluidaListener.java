@@ -1,0 +1,26 @@
+package com.gabrieltiziano.banking_credit_gateway.listener;
+
+import com.gabrieltiziano.banking_credit_gateway.dto.PropostaConcluidaMessage;
+import com.gabrieltiziano.banking_credit_gateway.entities.Proposta;
+import com.gabrieltiziano.banking_credit_gateway.repository.PropostaRepository;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class PropostaConcluidaListener {
+    private final PropostaRepository propostaRepository;
+
+    public PropostaConcluidaListener(PropostaRepository propostaRepository) {
+        this.propostaRepository = propostaRepository;
+    }
+
+    @RabbitListener(queues = "${rabbitmq.queue.proposta.concluida}")
+    public void propostaConcluida(PropostaConcluidaMessage proposta) {
+        Proposta existente = propostaRepository.findById(proposta.id()).orElseThrow();
+
+        existente.setStatus(proposta.status());
+        existente.setObservacao(proposta.observacao());
+
+        propostaRepository.save(existente);
+    }
+}
