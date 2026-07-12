@@ -14,7 +14,7 @@ public record PropostaResponse(
         String cpf,
         String valorSolicitadoFmt,
         Integer prazoPagamento,
-        StatusProposta status,
+        Boolean aprovada,
         String observacao
 ) {
     public static PropostaResponse from(Proposta proposta){
@@ -25,9 +25,17 @@ public record PropostaResponse(
                 proposta.getUsuario().getCpf(),
                 formatarMoeda(proposta.getValorSolicitado()),
                 proposta.getPrazoPagamento(),
-                proposta.getStatus(),
+                converterStatusParaAprovada(proposta.getStatus()),
                 proposta.getObservacao()
         );
+    }
+
+    private static Boolean converterStatusParaAprovada(StatusProposta status){
+        return switch (status) {
+            case APROVADA -> Boolean.TRUE;
+            case REJEITADA -> Boolean.FALSE;
+            case EM_ANALISE -> null;
+        };
     }
 
     private static String formatarMoeda(BigDecimal valor){
