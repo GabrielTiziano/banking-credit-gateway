@@ -19,3 +19,4 @@ rabbitmq:
   queue:
     proposta:
       pendente: proposta-pendente.ms-notificacao
+      concluida: proposta-concluida.ms-notificacao
