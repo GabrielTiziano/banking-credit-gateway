@@ -20,26 +20,140 @@ public class RabbitMQConfiguration {
     @Value("${rabbitmq.propostaconcluida.exchange}")
     private String exchangePropostaConcluida;
 
+    // EXCHANGES
+    @Bean
+    public FanoutExchange criarFanoutExchangePropostaPendente(){
+        return ExchangeBuilder.fanoutExchange(exchangePropostaPendente).build();
+    }
+
+    @Bean
+    public FanoutExchange criarFanoutExchangePropostaConcluida(){
+        return ExchangeBuilder.fanoutExchange(exchangePropostaConcluida).build();
+    }
+
+    // DLX
+    @Bean
+    public DirectExchange criarDeadLetterExchange(){
+        return ExchangeBuilder.directExchange("dead-letter.ex").build();
+    }
+
+    // PROPOSTA PENDENTE | MS ANÁLISE CRÉDITO
     @Bean
     public Queue criarFilaPropostaPendenteMsAnaliseCredito(){
-        return QueueBuilder.durable("proposta-pendente.ms-analise-credito").build();
+        return QueueBuilder.durable("proposta-pendente.ms-analise-credito")
+                .deadLetterExchange("dead-letter.ex")
+                .deadLetterRoutingKey("proposta-pendente.ms-analise-credito.dlq")
+                .build();
     }
 
+    @Bean
+    public Binding criarBindingPropostaPendenteMSNotificacao(){
+        return BindingBuilder
+                .bind(criarFilaPropostaPendenteMsNotificacao())
+                .to(criarFanoutExchangePropostaPendente());
+    }
+
+    @Bean
+    public Queue criarDLQPropostaPendenteMsAnaliseCredito(){
+        return QueueBuilder.durable("proposta-pendente.ms-analise-credito.dlq").build();
+    }
+
+    @Bean
+    public Binding criarBindingDLQPropostaPendenteMsAnaliseCredito(){
+        return BindingBuilder
+                .bind(criarDLQPropostaPendenteMsAnaliseCredito())
+                .to(criarDeadLetterExchange())
+                .with("proposta-pendente.ms-analise-credito.dlq");
+    }
+
+    @Bean
+    public Binding criarBindingPropostaPendenteMSAnaliseCredito(){
+        return BindingBuilder
+                .bind(criarFilaPropostaPendenteMsAnaliseCredito())
+                .to(criarFanoutExchangePropostaPendente());
+    }
+
+    // 2) PROPOSTA PENDENTE | MS NOTIFICAÇÃO
     @Bean
     public Queue criarFilaPropostaPendenteMsNotificacao(){
-        return QueueBuilder.durable("proposta-pendente.ms-notificacao").build();
+        return QueueBuilder.durable("proposta-pendente.ms-notificacao")
+                .deadLetterExchange("dead-letter.ex")
+                .deadLetterRoutingKey("proposta-pendente.ms-notificacao.dlq")
+                .build();
     }
 
+    @Bean
+    public Queue criarDLQPropostaPendenteMsNotificacao(){
+        return QueueBuilder.durable("proposta-pendente.ms-notificacao.dlq").build();
+    }
+
+    @Bean
+    public Binding criarBindingDLQPropostaPendenteMsNotificacao(){
+        return BindingBuilder
+                .bind(criarDLQPropostaPendenteMsNotificacao())
+                .to(criarDeadLetterExchange())
+                .with("proposta-pendente.ms-notificacao.dlq");
+    }
+
+    // 3) PROPOSTA CONCLUÍDA | MS PROPOSTA
     @Bean
     public Queue criarFilaPropostaConcluidaMsProposta(){
-        return QueueBuilder.durable("proposta-concluida.ms-proposta").build();
+        return QueueBuilder.durable("proposta-concluida.ms-proposta")
+                .deadLetterExchange("dead-letter.ex")
+                .deadLetterRoutingKey("proposta-concluida.ms-proposta.dlq")
+                .build();
     }
 
     @Bean
-    public Queue criarFilaPropostaConcluidaMsNotificacao(){
-        return QueueBuilder.durable("proposta-concluida.ms-notificacao").build();
+    public Binding criarBindingPropostaConcluidaMSPropostaApp(){
+        return BindingBuilder
+                .bind(criarFilaPropostaConcluidaMsProposta())
+                .to(criarFanoutExchangePropostaConcluida());
     }
 
+    @Bean
+    public Queue criarDLQPropostaConcluidaMsProposta(){
+        return QueueBuilder.durable("proposta-concluida.ms-proposta.dlq").build();
+    }
+
+    @Bean
+    public Binding criarBindingDLQPropostaConcluidaMsProposta(){
+        return BindingBuilder
+                .bind(criarDLQPropostaConcluidaMsProposta())
+                .to(criarDeadLetterExchange())
+                .with("proposta-concluida.ms-proposta.dlq");
+    }
+
+    // 4) PROPOSTA CONCLUÍDA | MS NOTIFICAÇÃO
+    @Bean
+    public Queue criarFilaPropostaConcluidaMsNotificacao(){
+        return QueueBuilder.durable("proposta-concluida.ms-notificacao")
+                .deadLetterExchange("dead-letter.ex")
+                .deadLetterRoutingKey("proposta-concluida.ms-notificacao.dlq")
+                .build();
+    }
+
+    @Bean
+    public Binding criarBindingPropostaConcluidaMSNotificacao(){
+        return BindingBuilder
+                .bind(criarFilaPropostaConcluidaMsNotificacao())
+                .to(criarFanoutExchangePropostaConcluida());
+    }
+
+    @Bean
+    public Queue criarDLQPropostaConcluidaMsNotificacao(){
+        return QueueBuilder.durable("proposta-concluida.ms-notificacao.dlq").build();
+    }
+
+    @Bean
+    public Binding criarBindingDLQPropostaConcluidaMsNotificacao(){
+        return BindingBuilder
+                .bind(criarDLQPropostaConcluidaMsNotificacao())
+                .to(criarDeadLetterExchange())
+                .with("proposta-concluida.ms-notificacao.dlq");
+    }
+
+    // OUTROS
     @Bean
     public RabbitAdmin criarRabbitAdmin(ConnectionFactory connectionFactory) {
         return new RabbitAdmin(connectionFactory);
@@ -53,44 +167,6 @@ public class RabbitMQConfiguration {
     @Bean
     public MessageConverter jsonMessageConverter() {
         return new JacksonJsonMessageConverter();
-    }
-
-    @Bean
-    public FanoutExchange criarFanoutExchangePropostaPendente(){
-        return ExchangeBuilder.fanoutExchange(exchangePropostaPendente).build();
-    }
-
-    @Bean
-    public FanoutExchange criarFanoutExchangePropostaConcluida(){
-        return ExchangeBuilder.fanoutExchange(exchangePropostaConcluida).build();
-    }
-
-    @Bean
-    public Binding criarBindingPropostaPendenteMSAnaliseCredito(){
-        return BindingBuilder
-            .bind(criarFilaPropostaPendenteMsAnaliseCredito())
-            .to(criarFanoutExchangePropostaPendente());
-    }
-
-    @Bean
-    public Binding criarBindingPropostaPendenteMSNotificacao(){
-        return BindingBuilder
-                .bind(criarFilaPropostaPendenteMsNotificacao())
-                .to(criarFanoutExchangePropostaPendente());
-    }
-
-    @Bean
-    public Binding criarBindingPropostaConcluidaMSPropostaApp(){
-        return BindingBuilder
-                .bind(criarFilaPropostaConcluidaMsProposta())
-                .to(criarFanoutExchangePropostaConcluida());
-    }
-
-    @Bean
-    public Binding criarBindingPropostaConcluidaMSNotificacao(){
-        return BindingBuilder
-                .bind(criarFilaPropostaConcluidaMsNotificacao())
-                .to(criarFanoutExchangePropostaConcluida());
     }
 
 }
