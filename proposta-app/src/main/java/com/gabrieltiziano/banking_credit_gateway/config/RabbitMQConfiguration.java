@@ -14,11 +14,22 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfiguration {
 
-    @Value("${rabbitmq.propostapendente.exchange}")
-    private String exchangePropostaPendente;
+    // Exchanges
+    @Value("${rabbitmq.exchange.proposta-pendente}")   private String exchangePropostaPendente;
+    @Value("${rabbitmq.exchange.proposta-concluida}")  private String exchangePropostaConcluida;
+    @Value("${rabbitmq.exchange.dead-letter}")         private String exchangeDeadLetter;
 
-    @Value("${rabbitmq.propostaconcluida.exchange}")
-    private String exchangePropostaConcluida;
+    // Queues
+    @Value("${rabbitmq.queue.analise-credito}")        private String filaAnaliseCredito;
+    @Value("${rabbitmq.queue.notificacao-pendente}")   private String filaNotificacaoPendente;
+    @Value("${rabbitmq.queue.proposta}")               private String filaProposta;
+    @Value("${rabbitmq.queue.notificacao-concluida}")  private String filaNotificacaoConcluida;
+
+    // DLQs
+    @Value("${rabbitmq.dlq.analise-credito}")          private String dlqAnaliseCredito;
+    @Value("${rabbitmq.dlq.notificacao-pendente}")     private String dlqNotificacaoPendente;
+    @Value("${rabbitmq.dlq.proposta}")                 private String dlqProposta;
+    @Value("${rabbitmq.dlq.notificacao-concluida}")    private String dlqNotificacaoConcluida;
 
     // EXCHANGES
     @Bean
@@ -34,28 +45,21 @@ public class RabbitMQConfiguration {
     // DLX
     @Bean
     public DirectExchange criarDeadLetterExchange(){
-        return ExchangeBuilder.directExchange("dead-letter.ex").build();
+        return ExchangeBuilder.directExchange(exchangeDeadLetter).build();
     }
 
     // PROPOSTA PENDENTE | MS ANÁLISE CRÉDITO
     @Bean
     public Queue criarFilaPropostaPendenteMsAnaliseCredito(){
-        return QueueBuilder.durable("proposta-pendente.ms-analise-credito")
-                .deadLetterExchange("dead-letter.ex")
-                .deadLetterRoutingKey("proposta-pendente.ms-analise-credito.dlq")
+        return QueueBuilder.durable(filaAnaliseCredito)
+                .deadLetterExchange(exchangeDeadLetter)
+                .deadLetterRoutingKey(dlqAnaliseCredito)
                 .build();
     }
 
     @Bean
-    public Binding criarBindingPropostaPendenteMSNotificacao(){
-        return BindingBuilder
-                .bind(criarFilaPropostaPendenteMsNotificacao())
-                .to(criarFanoutExchangePropostaPendente());
-    }
-
-    @Bean
     public Queue criarDLQPropostaPendenteMsAnaliseCredito(){
-        return QueueBuilder.durable("proposta-pendente.ms-analise-credito.dlq").build();
+        return QueueBuilder.durable(dlqAnaliseCredito).build();
     }
 
     @Bean
@@ -63,7 +67,7 @@ public class RabbitMQConfiguration {
         return BindingBuilder
                 .bind(criarDLQPropostaPendenteMsAnaliseCredito())
                 .to(criarDeadLetterExchange())
-                .with("proposta-pendente.ms-analise-credito.dlq");
+                .with(dlqAnaliseCredito);
     }
 
     @Bean
@@ -76,15 +80,22 @@ public class RabbitMQConfiguration {
     // 2) PROPOSTA PENDENTE | MS NOTIFICAÇÃO
     @Bean
     public Queue criarFilaPropostaPendenteMsNotificacao(){
-        return QueueBuilder.durable("proposta-pendente.ms-notificacao")
-                .deadLetterExchange("dead-letter.ex")
-                .deadLetterRoutingKey("proposta-pendente.ms-notificacao.dlq")
+        return QueueBuilder.durable(filaNotificacaoPendente)
+                .deadLetterExchange(exchangeDeadLetter)
+                .deadLetterRoutingKey(dlqNotificacaoPendente)
                 .build();
     }
 
     @Bean
+    public Binding criarBindingPropostaPendenteMSNotificacao(){
+        return BindingBuilder
+                .bind(criarFilaPropostaPendenteMsNotificacao())
+                .to(criarFanoutExchangePropostaPendente());
+    }
+
+    @Bean
     public Queue criarDLQPropostaPendenteMsNotificacao(){
-        return QueueBuilder.durable("proposta-pendente.ms-notificacao.dlq").build();
+        return QueueBuilder.durable(dlqNotificacaoPendente).build();
     }
 
     @Bean
@@ -92,15 +103,15 @@ public class RabbitMQConfiguration {
         return BindingBuilder
                 .bind(criarDLQPropostaPendenteMsNotificacao())
                 .to(criarDeadLetterExchange())
-                .with("proposta-pendente.ms-notificacao.dlq");
+                .with(dlqNotificacaoPendente);
     }
 
     // 3) PROPOSTA CONCLUÍDA | MS PROPOSTA
     @Bean
     public Queue criarFilaPropostaConcluidaMsProposta(){
-        return QueueBuilder.durable("proposta-concluida.ms-proposta")
-                .deadLetterExchange("dead-letter.ex")
-                .deadLetterRoutingKey("proposta-concluida.ms-proposta.dlq")
+        return QueueBuilder.durable(filaProposta)
+                .deadLetterExchange(exchangeDeadLetter)
+                .deadLetterRoutingKey(dlqProposta)
                 .build();
     }
 
@@ -113,7 +124,7 @@ public class RabbitMQConfiguration {
 
     @Bean
     public Queue criarDLQPropostaConcluidaMsProposta(){
-        return QueueBuilder.durable("proposta-concluida.ms-proposta.dlq").build();
+        return QueueBuilder.durable(dlqProposta).build();
     }
 
     @Bean
@@ -121,15 +132,15 @@ public class RabbitMQConfiguration {
         return BindingBuilder
                 .bind(criarDLQPropostaConcluidaMsProposta())
                 .to(criarDeadLetterExchange())
-                .with("proposta-concluida.ms-proposta.dlq");
+                .with(dlqProposta);
     }
 
     // 4) PROPOSTA CONCLUÍDA | MS NOTIFICAÇÃO
     @Bean
     public Queue criarFilaPropostaConcluidaMsNotificacao(){
-        return QueueBuilder.durable("proposta-concluida.ms-notificacao")
-                .deadLetterExchange("dead-letter.ex")
-                .deadLetterRoutingKey("proposta-concluida.ms-notificacao.dlq")
+        return QueueBuilder.durable(filaNotificacaoConcluida)
+                .deadLetterExchange(exchangeDeadLetter)
+                .deadLetterRoutingKey(dlqNotificacaoConcluida)
                 .build();
     }
 
@@ -137,12 +148,12 @@ public class RabbitMQConfiguration {
     public Binding criarBindingPropostaConcluidaMSNotificacao(){
         return BindingBuilder
                 .bind(criarFilaPropostaConcluidaMsNotificacao())
-                .to(criarFanoutExchangePropostaConcluida());
+                .to(criarFanoutExchangePropostaConcluida());  // fanout CONCLUÍDA
     }
 
     @Bean
     public Queue criarDLQPropostaConcluidaMsNotificacao(){
-        return QueueBuilder.durable("proposta-concluida.ms-notificacao.dlq").build();
+        return QueueBuilder.durable(dlqNotificacaoConcluida).build();
     }
 
     @Bean
@@ -150,7 +161,7 @@ public class RabbitMQConfiguration {
         return BindingBuilder
                 .bind(criarDLQPropostaConcluidaMsNotificacao())
                 .to(criarDeadLetterExchange())
-                .with("proposta-concluida.ms-notificacao.dlq");
+                .with(dlqNotificacaoConcluida);
     }
 
     // OUTROS

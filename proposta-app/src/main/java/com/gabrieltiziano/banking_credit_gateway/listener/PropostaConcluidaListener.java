@@ -18,7 +18,7 @@ public class PropostaConcluidaListener {
         this.webSocketService = webSocketService;
     }
 
-    @RabbitListener(queues = "${rabbitmq.queue.proposta.concluida}")
+    @RabbitListener(queues = "${rabbitmq.queue.proposta}")
     public void propostaConcluida(PropostaConcluidaMessage proposta) {
         Proposta existente = propostaRepository.findById(proposta.id()).orElseThrow();
 
