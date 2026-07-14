@@ -20,10 +20,17 @@ spring:
           max-attempts: 3
 
 rabbitmq:
-  propostapendente:
-    exchange: proposta-pendente.ex
-  propostaconcluida:
-    exchange: proposta-concluida.ex
+  exchange:
+    proposta-pendente: proposta-pendente.ex
+    proposta-concluida: proposta-concluida.ex
+    dead-letter: dead-letter.ex
   queue:
-    proposta:
-      concluida: proposta-concluida.ms-proposta
+    analise-credito: proposta-pendente.ms-analise-credito
+    notificacao-pendente: proposta-pendente.ms-notificacao
+    proposta: proposta-concluida.ms-proposta
+    notificacao-concluida: proposta-concluida.ms-notificacao
+  dlq:
+    analise-credito: proposta-pendente.ms-analise-credito.dlq
+    notificacao-pendente: proposta-pendente.ms-notificacao.dlq
+    proposta: proposta-concluida.ms-proposta.dlq
+    notificacao-concluida: proposta-concluida.ms-notificacao.dlq

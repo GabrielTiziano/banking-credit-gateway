@@ -19,14 +19,15 @@ public class PropostaSemIntegracao {
     private final NotificacaoService notificacaoService;
 
     public PropostaSemIntegracao(PropostaRepository propostaRepository,
-                                 @Value("${rabbitmq.propostapendente.exchange}") String exchange, NotificacaoService notificacaoService) {
+                                 @Value("${rabbitmq.exchange.proposta-pendente}") String exchange,
+                                 NotificacaoService notificacaoService) {
         this.propostaRepository = propostaRepository;
         this.exchange = exchange;
         this.notificacaoService = notificacaoService;
     }
 
     @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.SECONDS)
-    public void buscarPropostasSemIntegracao(){
+    public void buscarPropostasSemIntegracao() {
         propostaRepository.findAllByIntegradaIsFalse().forEach(proposta -> {
             try {
                 notificacaoService.notificar(PropostaPendenteMessage.from(proposta), exchange);
@@ -37,7 +38,7 @@ public class PropostaSemIntegracao {
         });
     }
 
-    private void atualizarProposta(Proposta proposta){
+    private void atualizarProposta(Proposta proposta) {
         proposta.setIntegrada(true);
         propostaRepository.save(proposta);
     }
